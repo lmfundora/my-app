@@ -1,5 +1,4 @@
 "use client";
-import { Email, Password } from "@/components/inputs";
 import {
   Avatar,
   AvatarFallback,
@@ -9,56 +8,66 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/index";
+  Label,
+  Input,
+} from "@/components/ui";
 import Link from "next/link";
 import { FaAngleRight } from "react-icons/fa6";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 
-import { logIn } from "@/api";
-import { logInData } from "@/interfaces";
 import { useToast } from "@/components/ui/use-toast";
-import { AxiosError } from "axios";
-import { userStore } from "@/app/store/userStore";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { logInShema } from "@/validations/userSchema";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+type Input = {
+  email: string;
+  password: string;
+};
 
 export default function LogIn() {
   const { toast } = useToast();
-  const seter = userStore((state) => state.logIn);
+  const router = useRouter()
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Input>({
+    resolver: zodResolver(logInShema),
+  });
 
-    let email = formData.get("email");
-    let password = formData.get("password");
+  let [inputType, setInputType] = useState("password");
 
-    if (email && password) {
-      const data: logInData = {
-        email: email.toString(),
-        password: password.toString(),
-      };
-      {
-        try {
-          let response = await logIn(data);
-          toast({
-            duration: 3000,
-            color: "#4ade80",
-            title: "Success",
-            description: "You have loged in with success",
-          });
-          console.log(response);
-          seter(response);
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            toast({
-              duration: 3000,
-              variant: "destructive",
-              title: error.response?.statusText,
-              description: error.response?.data,
-            });
-            console.log(error.response?.data);
-          }
-        }
-      }
+  function togglePasswordVisivility() {
+    setInputType(inputType === "text" ? "password" : "text");
+  }
+
+  const onSubmit: SubmitHandler<Input> = async (data) => {
+
+    console.log(data);
+    
+    const res = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false
+    });
+
+    console.log(res);
+    
+    if (res?.error) {
+      toast({
+        variant: "destructive",
+        title: "Ups!!!",
+        description: res.error,
+      });
     }
+
+    router.push("/business")
   };
 
   return (
@@ -73,11 +82,43 @@ export default function LogIn() {
             <CardTitle className="mx-auto">Log IN</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit}>
-              <Email />
-              <Password />
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Label htmlFor="email" className="ms-1 mb-1">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email")}
+                placeholder="usuario@gmail.com"
+                className="border-purple-500 outlined border-2 focus:ring-4 ring-0 ring-purple-300"
+              />
+              {errors.email?.message && (
+                <p className="text-red-500">{errors.email.message}</p>
+              )}
+              <div className="flex w-full justify-between">
+                <Label htmlFor="email" className="ms-1 mt-1">
+                  Password
+                </Label>
+                <button
+                  type="button"
+                  className="me-2"
+                  onClick={togglePasswordVisivility}
+                >
+                  {inputType == "password" ? <FaRegEye /> : <FaRegEyeSlash />}
+                </button>
+              </div>
+              <Input
+                id="email"
+                type={inputType}
+                className="border-purple-500 outlined border-2 focus:ring-4 ring-0 ring-purple-300"
+                {...register("password")}
+              />
+              {errors.password?.message && (
+                <p className="text-red-500">{errors.password.message}</p>
+              )}
               <Link
-                href={"/singUp"}
+                href={"/signUp"}
                 className="text-blue-400 text-sm underline mx-auto italic"
               >
                 Crear cuenta
