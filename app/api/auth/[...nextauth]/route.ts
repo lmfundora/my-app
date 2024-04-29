@@ -2,8 +2,6 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { pages } from "next/dist/build/templates/app-page";
-import { signIn } from "next-auth/react";
 
 interface User {
   id: string;
