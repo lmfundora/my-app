@@ -54,7 +54,8 @@ export default function LogIn() {
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirect: false
+      redirect: false,
+      callbackUrl: "/business"
     });
 
     console.log(res);
