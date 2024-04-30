@@ -33,9 +33,8 @@ type Input = {
 };
 
 export default function SingUp() {
-
   const { toast } = useToast();
-  const router = useRouter()
+  const router = useRouter();
 
   const {
     register,
@@ -52,7 +51,6 @@ export default function SingUp() {
   }
 
   const onSubmit: SubmitHandler<Input> = async (data) => {
-
     try {
       delete data.confirmpassword;
 
@@ -67,8 +65,7 @@ export default function SingUp() {
         title: "Felicitaciones",
         description: "Usuario creado exitosamente",
       });
-      router.push('/logIn')
-
+      router.push("/logIn");
     } catch (error) {
       if (error instanceof axios.AxiosError) {
         switch (error.response?.data.code) {
@@ -100,12 +97,14 @@ export default function SingUp() {
 
             break;
         }
+      } else {
+        console.log("siu");
+        toast({
+          variant: "destructive",
+          title: "Error al crear usuario",
+          description: "Contacte con soporte",
+        });
       }
-      toast({
-        variant: "destructive",
-        title: "Error al crear usuario",
-        description: "Contacte con soporte",
-      });
     }
   };
 
