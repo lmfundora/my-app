@@ -31,7 +31,7 @@ type Input = {
 
 export default function LogIn() {
   const { toast } = useToast();
-  const router = useRouter()
+  const router = useRouter();
 
   const {
     register,
@@ -49,26 +49,34 @@ export default function LogIn() {
 
   const onSubmit: SubmitHandler<Input> = async (data) => {
 
-    console.log(data);
-    
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
-      callbackUrl: "/business"
+      callbackUrl: "/dashboard/administration",
     });
 
-    console.log(res);
-    
     if (res?.error) {
-      toast({
-        variant: "destructive",
-        title: "Ups!!!",
-        description: res.error,
-      });
+      if (
+        res?.error ==
+        "\nInvalid `prisma.user.findUnique()` invocation:\n\n\nCan't reach database server at `localhost`:`5432`\n\nPlease make sure your database server is running at `localhost`:`5432`."
+      ) {
+        toast({
+          variant: "destructive",
+          title: "Ups!!!",
+          description:
+            "Inposible conectar con el servidor. Contacte con los admins.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Ups!!!",
+          description: res.error,
+        });
+      }
+    } else {
+      router.push("/dashboard/administration");
     }
-
-    router.push("/business")
   };
 
   return (

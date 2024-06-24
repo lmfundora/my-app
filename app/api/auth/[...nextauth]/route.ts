@@ -9,7 +9,7 @@ interface User {
   email: string;
 }
 
-const authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",

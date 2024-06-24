@@ -10,3 +10,11 @@ export {
 } from "./card";
 export { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export { Label } from "@/components/ui/label";
+export { 
+    Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
